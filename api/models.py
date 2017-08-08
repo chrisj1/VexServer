@@ -2,11 +2,29 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from api.jsonHelpers import get_json_from_URL
 
 
 # Create your models here.
 class Team(models.Model):
-    team_id = models.CharField(max_length=7)
+    team_number = models.CharField(max_length=10)
+    sku = models.CharField(max_length=70)
+    organization = models.CharField(max_length=70)
+    team_name = models.CharField(max_length=70)
+    robot_name = models.CharField(max_length=100)
+
+    def update(self):
+        json = get_json_from_URL('https://api.vexdb.io/v1/get_teams?team=9228A')
+        if json['size'] != 1:
+            print('invalid team number')
+            return
+        print(json['size'])
+        result = json['result'][0]
+        print(result[0])
+        self.organization = result['organization']
+        self.team_name = result['team_name']
+        self.robot_name = result['robot_name']
+        self.save()
 
 
 class Match(models.Model):
@@ -23,14 +41,23 @@ class Match(models.Model):
 
 class IndivualTeamMatchPerformance(models.Model):
     team = models.ForeignKey(Team)
+
+    teleop_description = models.CharField(max_length=700)
     cones_on_goal = models.IntegerField()
     mobile_goals_scored_in_5 = models.IntegerField()
     mobile_goals_scored_in_10 = models.IntegerField()
     mobile_goals_scored_in_20 = models.IntegerField()
     robot_parks = models.BooleanField()
-    autonomous_points=models.IntegerField()
 
-    autonomous_description=models.CharField(max_length=700)
-    teleop_description=models.CharField(max_length=700)
     penalties = models.IntegerField()
     penalties_point_deductions = models.IntegerField()
+
+    autonomous_description=models.CharField(max_length=700)
+    autonomous_points=models.IntegerField()
+    autonomous_cones_stacked=models.IntegerField()
+    autonomous_mobile_goals_scored_in_5 = models.IntegerField()
+    autonomous_mobile_goals_scored_in_10 = models.IntegerField()
+    autonomous_mobile_goals_scored_in_20 = models.IntegerField()
+    higest_stack_in_5 = models.IntegerField()
+    higest_stack_in_10 = models.IntegerField()
+    higest_stack_in_20 = models.IntegerField()

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import requests
+
 
 from django.shortcuts import render
 
@@ -15,4 +17,12 @@ def index(request):
 
 def teams(request):
     return Team.objects.all()
+
+
+def events(request):
+    r = requests.get('https://api.vexdb.io/v1/get_teams?team=2915A')
+
+    print(r.json())
+
+    return HttpResponse(r.text)
 
